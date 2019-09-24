@@ -27,14 +27,26 @@ main:
 	brsh firstDigitHex
 	jmp firstDigitDec
 	firstDigitHex:
-	    ldi r20, 6
-		mul firstDigit, r20
 		subi firstDigit, HEX_SUB
 		ori baseFlag, 0b10000000
 	firstDigitDec: 
 	    subi firstDigit, DEC_OFFSET ;convert to number
+
+	;if DEC, multiply by 10, else 16 to
+	cpi baseFlag, 0
+	brne hexadecimal
+	jmp decimal
+	hexadecimal:
+		ldi r20, 16
+		mul firstDigit, r20
+		mov firstDigit, r0
+		jmp hex_end
+	decimal:
 		ldi r20, 10
 		mul firstDigit, r20
+		mov firstDigit, r0
+		ldi r20, 0 ;clear register 20
+	hex_end:
 
 	;is the second digit >= A? 
 	cpi secondDigit, HEX_OFFSET
@@ -46,8 +58,22 @@ main:
 	secondDigitDec: subi secondDigit, DEC_OFFSET ;convert to number
 
 	;both digits are now ready to be converted to a binary number
-	mov output, r0 ;move result to output
-	add output, secondDigit
+	mov output, secondDigit ;move result to output
+	add output, firstDigit
 	or output, baseFlag
-	nop
+	returnResult:
+	wdr
+	
+
+
+
+ 
+	
+
+
+
+
+
+
+	
 
