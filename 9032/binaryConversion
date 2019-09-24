@@ -1,0 +1,53 @@
+;
+; BinaryConversion.asm
+;
+; Created: 24/09/2019 1:39:46 PM
+; Author : Jacob Burns
+; Converts an ascii representation of a number to a binary value
+
+; constants and defines
+.include "m2560def.inc"
+.def firstDigit=r16
+.def secondDigit=r17
+.def output=r18
+.def baseFlag=r19
+
+.EQU HEX_SUB=7
+.EQU DEC_OFFSET=48 ; offset for dec digits 1, 2, 3...
+.EQU HEX_OFFSET=65 ; offset for hex digits A, B, C...
+
+;debugging - 
+ldi firstDigit, 0x46
+ldi secondDigit, 0x46
+
+main:
+	; check whether  digit is hex value, adjust accordingly
+	;is the first digit >= A? 
+	cpi firstDigit, HEX_OFFSET
+	brsh firstDigitHex
+	jmp firstDigitDec
+	firstDigitHex:
+	    ldi r20, 6
+		mul firstDigit, r20
+		subi firstDigit, HEX_SUB
+		ori baseFlag, 0b10000000
+	firstDigitDec: 
+	    subi firstDigit, DEC_OFFSET ;convert to number
+		ldi r20, 10
+		mul firstDigit, r20
+
+	;is the second digit >= A? 
+	cpi secondDigit, HEX_OFFSET
+	brsh secondDigitHex
+	jmp secondDigitDec
+    secondDigitHex: 
+		subi secondDigit, HEX_SUB
+		ori baseFlag, 0b10000000
+	secondDigitDec: subi secondDigit, DEC_OFFSET ;convert to number
+
+	;both digits are now ready to be converted to a binary number
+	mov output, r0 ;move result to output
+	add output, secondDigit
+	or output, baseFlag
+	nop
+
