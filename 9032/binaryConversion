@@ -1,0 +1,79 @@
+;
+; BinaryConversion.asm
+;
+; Created: 24/09/2019 1:39:46 PM
+; Author : Jacob Burns
+; Converts an ascii representation of a number to a binary value
+
+; constants and defines
+.include "m2560def.inc"
+.def firstDigit=r16
+.def secondDigit=r17
+.def output=r18
+.def baseFlag=r19
+
+.EQU HEX_SUB=7
+.EQU DEC_OFFSET=48 ; offset for dec digits 1, 2, 3...
+.EQU HEX_OFFSET=65 ; offset for hex digits A, B, C...
+
+;debugging - 
+ldi firstDigit, 0x46
+ldi secondDigit, 0x46
+
+main:
+	; check whether  digit is hex value, adjust accordingly
+	;is the first digit >= A? 
+	cpi firstDigit, HEX_OFFSET
+	brsh firstDigitHex
+	jmp firstDigitDec
+	firstDigitHex:
+		subi firstDigit, HEX_SUB
+		ori baseFlag, 0b10000000
+	firstDigitDec: 
+	    subi firstDigit, DEC_OFFSET ;convert to number
+
+	;if DEC, multiply by 10, else 16 to
+	cpi baseFlag, 0
+	brne hexadecimal
+	jmp decimal
+	hexadecimal:
+		ldi r20, 16
+		mul firstDigit, r20
+		mov firstDigit, r0
+		jmp hex_end
+	decimal:
+		ldi r20, 10
+		mul firstDigit, r20
+		mov firstDigit, r0
+		ldi r20, 0 ;clear register 20
+	hex_end:
+
+	;is the second digit >= A? 
+	cpi secondDigit, HEX_OFFSET
+	brsh secondDigitHex
+	jmp secondDigitDec
+    secondDigitHex: 
+		subi secondDigit, HEX_SUB
+		ori baseFlag, 0b10000000
+	secondDigitDec: subi secondDigit, DEC_OFFSET ;convert to number
+
+	;both digits are now ready to be converted to a binary number
+	mov output, secondDigit ;move result to output
+	add output, firstDigit
+	or output, baseFlag
+	returnResult:
+	wdr
+	
+
+
+
+ 
+	
+
+
+
+
+
+
+	
+
