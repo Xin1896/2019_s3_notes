@@ -19,3 +19,5 @@ If *n* is a positive integer, there are *n* integers *i* such that 1 <= *i* <= *
 
 If *m* and *n* are positive integers with *m*<=*n*, then the number of integers *i* such that m <= *i* <= *n* is:
 	*n* - (*m* - 1) = *n* - *m* + *1*
+
+
